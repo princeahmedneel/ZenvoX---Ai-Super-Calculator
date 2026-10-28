@@ -1,0 +1,326 @@
+<!-- PATH: index.html -->
+<!DOCTYPE html>
+<html lang="bn" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#141820" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="description" content="ZenvX - Casio fx-991ES Plus Natural Textbook Scientific Calculator, AI Math Solver, Real-time Messenger, Audio/Video Calls & Study Super-App" />
+  
+  <title>ZenvX — Scientific Calculator & Study Super-App</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="./manifest.json" />
+
+  <!-- Google Fonts: Hind Siliguri (Bangla), Inter (UI), JetBrains Mono (LCD/Code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- KaTeX CSS & JS for Natural Textbook Math Display -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+
+  <!-- Master Stylesheet (Step 3 File) -->
+  <link rel="stylesheet" href="./css/style.css" />
+
+  <!-- Emergency Boot Diagnostics Style (Works even before CSS file loads) -->
+  <style>
+    #boot-error-banner {
+      display: none;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      z-index: 99999;
+      background: #dc2626;
+      color: #ffffff;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-family: sans-serif;
+      font-size: 13px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      line-height: 1.5;
+    }
+    #boot-loader {
+      position: fixed;
+      inset: 0;
+      background: #141820;
+      color: #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Hind Siliguri', sans-serif;
+      z-index: 9999;
+      transition: opacity 0.25s ease;
+    }
+    .boot-spinner {
+      width: 42px;
+      height: 42px;
+      border: 4px solid rgba(107, 92, 231, 0.25);
+      border-top-color: #6b5ce7;
+      border-radius: 50%;
+      animation: zenvxSpin 0.8s linear infinite;
+      margin-bottom: 12px;
+    }
+    @keyframes zenvxSpin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 0. Emergency Error Banner (Shows exact file/line error if anything fails in Spck Editor) -->
+  <div id="boot-error-banner" role="alert"></div>
+
+  <!-- 1. Initial Boot Loader -->
+  <div id="boot-loader">
+    <div class="boot-spinner"></div>
+    <strong style="font-size: 1.1rem; letter-spacing: 0.5px;">ZenvX Super-App</strong>
+    <span id="boot-status-text" style="font-size: 0.8rem; color: #94a3b8; margin-top: 4px;">ইঞ্জিন লোড হচ্ছে...</span>
+  </div>
+
+  <!-- 2. Main Application Shell -->
+  <div id="app-shell" class="app-shell">
+
+    <!-- Top Global Navigation Header -->
+    <header id="app-header" class="app-header">
+      <div class="header-left">
+        <button type="button" id="btn-open-drawer" class="icon-btn" aria-label="মেনু খুলুন" title="মেনু">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <div class="brand-box">
+          <span class="brand-logo">ZenvX</span>
+          <span id="active-route-badge" class="route-badge">fx-991ES PLUS</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button type="button" id="btn-quick-ai" class="header-pill-btn" title="AI সলভার ও ক্যামেরা স্ক্যান">
+          <span>🤖 AI সলভার</span>
+        </button>
+        <button type="button" id="btn-theme-toggle" class="icon-btn" aria-label="থিম পরিবর্তন" title="ডার্ক/লাইট থিম">
+          <span id="theme-icon">🌙</span>
+        </button>
+        <button type="button" id="btn-open-settings" class="icon-btn" aria-label="সেটিংস" title="সেটিংস">
+          <span>⚙️</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Dynamic Screen Viewport Container -->
+    <main id="app-viewport" class="app-viewport">
+
+      <!-- ============================================================
+           SCREEN 1: SCIENTIFIC CALCULATOR (DEFAULT HOME SCREEN)
+           ============================================================ -->
+      <section id="screen-sci-calc" class="app-screen active-screen" data-route="sci-calc">
+        
+        <!-- 1A. Top Calculator Status Bar -->
+        <div class="sci-statusbar" id="sci-statusbar">
+          <div class="status-left">
+            <span id="st-shift" class="st-badge st-shift hidden">S</span>
+            <span id="st-alpha" class="st-badge st-alpha hidden">A</span>
+            <span id="st-hyp" class="st-badge st-hyp hidden">HYP</span>
+            <span id="st-mode" class="st-badge st-mod">COMP</span>
+            <span id="st-angle" class="st-badge" data-action="cycle-angle" style="cursor:pointer;">DEG</span>
+            <span id="st-norm" class="st-badge">NORM1</span>
+          </div>
+          <div class="status-right">
+            <span id="st-cmplx" class="st-badge hidden">CMPLX</span>
+            <span id="st-mat" class="st-badge hidden">MAT</span>
+            <span id="st-math" class="st-badge">MATH</span>
+            <span id="st-deci" class="st-badge" style="cursor:pointer;">বাং</span>
+          </div>
+        </div>
+
+        <!-- 1B. Natural Textbook LCD Display -->
+        <div class="sci-lcd-container" id="sci-lcd-container">
+          <!-- History & Current Expression Scroll Area -->
+          <div class="sci-expr-scroll" id="sci-expr-scroll">
+            <div id="sci-expression" class="sci-expression" aria-live="polite">0</div>
+          </div>
+
+          <!-- LCD Bottom Row: More Actions + Primary Result -->
+          <div class="sci-lcd-middle-row">
+            <div class="lcd-left-tools">
+              <button type="button" id="sci-details-trigger" class="lcd-tool-chip" title="ধাপে ধাপে সমাধান দেখুন">
+                🔍 Details
+              </button>
+              <button type="button" id="sci-copy-trigger" class="lcd-tool-chip" title="ফলাফল কপি করুন">
+                📋 Copy
+              </button>
+            </div>
+            <div id="sci-result" class="sci-result" aria-live="polite">0</div>
+          </div>
+        </div>
+
+        <!-- 1C. Quick Function Toolbar -->
+        <div class="sci-toolbar" id="sci-toolbar">
+          <button type="button" class="tb-btn tb-scan" id="btn-tb-scan">📷 AI Scan</button>
+          <button type="button" class="tb-btn" id="btn-tb-const">CONST</button>
+          <button type="button" class="tb-btn" id="btn-tb-conv">CONV</button>
+          <button type="button" class="tb-btn" id="btn-tb-cas">CAS ∫dx</button>
+          <button type="button" class="tb-btn" id="btn-tb-graph">📈 Graph</button>
+          <button type="button" class="tb-btn" id="btn-tb-more">MORE ▾</button>
+        </div>
+
+        <!-- 1D. 9x6 Scientific Keypad Mount -->
+        <div id="sci-keypad-mount" class="sci-keypad-mount" role="group" aria-label="সায়েন্টিফিক ক্যালকুলেটর কিপ্যাড">
+          <!-- Dynamically populated by js/calc-scientific.js -->
+        </div>
+      </section>
+
+      <!-- ============================================================
+           SCREEN 2: NORMAL CALCULATOR & GRAPH PLOTTER
+           ============================================================ -->
+      <section id="screen-normal-graph" class="app-screen hidden" data-route="normal-graph"></section>
+
+      <!-- ============================================================
+           SCREEN 3: AI SOLVER, CAMERA OCR & AI TUTOR CHAT
+           ============================================================ -->
+      <section id="screen-ai-solver" class="app-screen hidden" data-route="ai-solver"></section>
+
+      <!-- ============================================================
+           SCREEN 4: REAL-TIME MESSENGER & GROUP STUDY CHAT
+           ============================================================ -->
+      <section id="screen-messenger" class="app-screen hidden" data-route="messenger"></section>
+
+      <!-- ============================================================
+           SCREEN 5: YOUTUBE EDUCATIONAL FEED & REELS
+           ============================================================ -->
+      <section id="screen-video-reels" class="app-screen hidden" data-route="video-reels"></section>
+
+      <!-- ============================================================
+           SCREEN 6: CREATIVE HUB (NOTES, WHITEBOARD, TIMER, FORMULAS)
+           ============================================================ -->
+      <section id="screen-creative-hub" class="app-screen hidden" data-route="creative-hub"></section>
+
+      <!-- ============================================================
+           SCREEN 7: PROFILE, AUTH, CREATOR WALLET & ADMIN PANEL
+           ============================================================ -->
+      <section id="screen-profile-wallet" class="app-screen hidden" data-route="profile-wallet"></section>
+
+    </main>
+
+    <!-- Bottom Quick Navigation Bar -->
+    <nav id="app-bottom-nav" class="app-bottom-nav" aria-label="প্রধান নেভিগেশন">
+      <button type="button" class="bnav-item active" data-target="sci-calc">
+        <span class="bnav-icon">🧮</span>
+        <span class="bnav-label">সায়েন্টিফিক</span>
+      </button>
+      <button type="button" class="bnav-item" data-target="normal-graph">
+        <span class="bnav-icon">📈</span>
+        <span class="bnav-label">গ্রাফ ও সাধারণ</span>
+      </button>
+      <button type="button" class="bnav-item" data-target="ai-solver">
+        <span class="bnav-icon">🤖</span>
+        <span class="bnav-label">AI সলভার</span>
+      </button>
+      <button type="button" class="bnav-item" data-target="messenger">
+        <span class="bnav-icon">💬</span>
+        <span class="bnav-label">চ্যাট ও কল</span>
+      </button>
+      <button type="button" class="bnav-item" data-target="video-reels">
+        <span class="bnav-icon">▶️</span>
+        <span class="bnav-label">ভিডিও ও রিলস</span>
+      </button>
+      <button type="button" class="bnav-item" data-target="creative-hub">
+        <span class="bnav-icon">🎨</span>
+        <span class="bnav-label">স্টাডি হাব</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- 3. Navigation Drawer Overlay -->
+  <div id="drawer-backdrop" class="drawer-backdrop hidden"></div>
+  <aside id="app-drawer" class="app-drawer hidden" aria-label="সাইডবার মেনু">
+    <div class="drawer-header">
+      <div>
+        <h2 style="font-size:1.15rem;font-weight:800;color:var(--text-primary);">ZenvX Super-App</h2>
+        <p style="font-size:0.75rem;color:var(--text-muted);">v2.5 Master Edition</p>
+      </div>
+      <button type="button" id="btn-close-drawer" class="icon-btn" aria-label="মেনু বন্ধ করুন">✕</button>
+    </div>
+
+    <div class="drawer-body">
+      <button type="button" class="drawer-link" data-nav="sci-calc">🧮 সায়েন্টিফিক ক্যালকুলেটর (fx-991ES)</button>
+      <button type="button" class="drawer-link" data-nav="normal-graph">📈 গ্রাফ প্লটার ও সাধারণ ক্যালকুলেটর</button>
+      <button type="button" class="drawer-link" data-nav="ai-solver">🤖 AI অংক সলভার ও ক্যামেরা OCR</button>
+      <button type="button" class="drawer-link" data-nav="messenger">💬 রিয়েল-টাইম চ্যাট ও গ্রুপ স্টাডি</button>
+      <button type="button" class="drawer-link" data-nav="video-reels">▶️ শিক্ষামূলক ভিডিও ফিড ও রিলস</button>
+      <button type="button" class="drawer-link" data-nav="creative-hub">🎨 স্টাডি নোটস, হোয়াইটবোর্ড ও টাইমার</button>
+      <button type="button" class="drawer-link" data-nav="profile-wallet">👤 প্রোফাইল, লগইন ও ক্রিয়েটর ওয়ালেট</button>
+    </div>
+
+    <div class="drawer-footer">
+      <button type="button" id="btn-diagnostics" class="btn-secondary btn-sm" style="width:100%;">
+        🩺 সিস্টেম ডায়াগনস্টিকস ও এরর চেক
+      </button>
+    </div>
+  </aside>
+
+  <!-- 4. Fullscreen Audio/Video Call Overlay Root -->
+  <div id="call-overlay-root" class="call-overlay-root hidden"></div>
+
+  <!-- 5. Reusable Modal & Bottom Sheet Root -->
+  <div id="modal-root" class="modal-root hidden"></div>
+  <div id="bottom-sheet-root" class="bottom-sheet-root hidden"></div>
+
+  <!-- 6. Toast Notification Stack -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- 7. Built-in Early Error Guard & File Protocol Detector -->
+  <script>
+    (function() {
+      var banner = document.getElementById('boot-error-banner');
+      var bootLoader = document.getElementById('boot-loader');
+
+      function showBootError(title, detail) {
+        if (bootLoader) bootLoader.style.display = 'none';
+        if (!banner) return;
+        banner.style.display = 'block';
+        banner.innerHTML = '<strong>⚠️ ' + title + '</strong><br/>' + detail;
+      }
+
+      // Check if opened directly via file:// instead of HTTP Server / Spck Preview
+      if (window.location.protocol === 'file:') {
+        showBootError(
+          'ফাইল প্রোটোকল (file://) সনাক্ত হয়েছে!',
+          'ES6 Module (import/export) সরাসরি ফাইল ম্যানেজার থেকে ওপেন করলে ব্রাউজার ব্লক করে। অনুগ্রহ করে Spck Editor-এর Play (▶) বাটনে চাপুন অথবা VS Code Live Server দিয়ে রান করুন।'
+        );
+      }
+
+      window.addEventListener('error', function(e) {
+        var msg = e.message || 'অজানা স্ক্রিপ্ট ত্রুটি';
+        var file = e.filename ? e.filename.split('/').pop() : 'unknown';
+        showBootError('স্ক্রিপ্ট লোডিং বা রানটাইম এরর (' + file + ')', msg + ' (Line: ' + (e.lineno || '?') + ')');
+      });
+
+      window.addEventListener('unhandledrejection', function(e) {
+        var reason = e.reason && (e.reason.message || e.reason) ? (e.reason.message || e.reason) : 'Promise Rejection';
+        console.warn('Unhandled Promise Rejection:', reason);
+      });
+
+      // Fallback auto-hide boot loader after 2.5 seconds even if a minor module is aún pending
+      setTimeout(function() {
+        if (bootLoader && bootLoader.style.display !== 'none') {
+          bootLoader.style.opacity = '0';
+          setTimeout(function() { bootLoader.style.display = 'none'; }, 260);
+        }
+      }, 2500);
+    })();
+  </script>
+
+  <!-- 8. Main Application Entry Point (Step 20 File) -->
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
